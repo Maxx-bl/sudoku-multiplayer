@@ -2,10 +2,9 @@ const SudokuEngine = {
     generate(difficulty) {
         const sol = Array.from({length:9}, () => Array(9).fill(0));
         this.solve(sol, true);
-
         const board = sol.map(row => [...row]);
         const given = Array.from({length:9}, () => Array(9).fill(true));
-        const removeCount = { easy: 30, medium: 42, hard: 52 }[difficulty] || 40;
+        const removeCount = { easy: 30, medium: 45, hard: 55 }[difficulty];
 
         let removed = 0;
         const positions = this.shuffle([...Array(81).keys()]);
@@ -16,7 +15,6 @@ const SudokuEngine = {
             given[r][c] = false;
             removed++;
         }
-        
         return { board, solution: sol, given };
     },
 
@@ -24,7 +22,8 @@ const SudokuEngine = {
         const empty = this.findEmpty(board);
         if (!empty) return true;
         const [r, c] = empty;
-        let nums = this.shuffle([1,2,3,4,5,6,7,8,9]);
+        let nums = [1,2,3,4,5,6,7,8,9];
+        if (randomize) nums = this.shuffle(nums);
         for (const n of nums) {
             if (this.isValid(board, r, c, n)) {
                 board[r][c] = n;

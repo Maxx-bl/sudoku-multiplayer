@@ -5,49 +5,19 @@ const ui = {
         board: [],
         solution: [],
         given: [],
-        notes: [],
         selected: null,
         noteMode: false,
         errors: 0,
         timer: 0,
-        interval: null
-    },
-
-    init() {
-        this.bindEvents();
-    },
-
-    bindEvents() {
-        // Navigation & Menu
-        document.getElementById('btnSolo').onclick = () => this.togglePanel('diffPanel');
-        document.getElementById('btnMulti').onclick = () => this.togglePanel('multiPanel');
-        
-        document.querySelectorAll('.diff-btn').forEach(btn => {
-            btn.onclick = () => this.startGame('solo', btn.dataset.diff);
-        });
-
-        document.getElementById('btnCreateRoom').onclick = () => {
-            document.getElementById('lobbyCode').textContent = Math.random().toString(36).substring(2, 8).toUpperCase();
-            this.showScreen('lobby');
-        };
-
-        // Game Controls
-        document.getElementById('noteBtn').onclick = () => {
-            this.state.noteMode = !this.state.noteMode;
-            document.getElementById('noteBtn').classList.toggle('active');
-        };
-
-        document.getElementById('btnUndo').onclick = () => this.undo();
-        document.getElementById('btnErase').onclick = () => this.fillCell(0);
-        document.getElementById('btnHint').onclick = () => this.giveHint();
-        document.getElementById('overlayReplayBtn').onclick = () => this.startGame(this.state.mode, this.state.difficulty);
+        interval: null,
+        history: []
     },
 
     togglePanel(id) {
-        const p = document.getElementById(id);
-        const isOpen = p.classList.contains('open');
-        document.querySelectorAll('.diff-panel, .multi-panel').forEach(el => el.classList.remove('open'));
-        if (!isOpen) p.classList.add('open');
+        const el = document.getElementById(id);
+        const isOpen = el.classList.contains('open');
+        document.querySelectorAll('.diff-panel, .multi-panel, .room-input-area').forEach(p => p.classList.remove('open'));
+        if (!isOpen) el.classList.add('open');
     },
 
     showScreen(id) {
@@ -57,7 +27,22 @@ const ui = {
 
     goHome() {
         clearInterval(this.state.interval);
+        document.getElementById('overlay').classList.remove('show');
         this.showScreen('home');
+    },
+
+    createRoom() {
+        const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+        document.getElementById('lobbyCode').textContent = code;
+        this.showScreen('lobby');
+        setTimeout(() => {
+            document.getElementById('slot2').classList.replace('waiting', 'filled');
+            document.getElementById('slot2').innerHTML = "Adversaire Prêt";
+        }, 2000);
+    },
+
+    joinRoom() {
+        this.startGame('multi', 'medium');
     },
 
     startGame(mode, diff) {
@@ -65,17 +50,21 @@ const ui = {
         this.state.difficulty = diff;
         this.state.errors = 0;
         this.state.timer = 0;
+        this.state.history = [];
         
         const data = SudokuEngine.generate(diff);
         this.state.board = data.board;
         this.state.solution = data.solution;
         this.state.given = data.given;
-        this.state.notes = Array.from({length:9}, () => Array.from({length:9}, () => new Set()));
 
+        document.getElementById('mpBar').style.display = mode === 'multi' ? 'flex' : 'none';
+        document.getElementById('diffBadge').textContent = diff.toUpperCase();
+        
         this.renderBoard();
         this.renderNumpad();
         this.startTimer();
         this.showScreen('game');
+        document.getElementById('overlay').classList.remove('show');
     },
 
     startTimer() {
@@ -89,8 +78,8 @@ const ui = {
     },
 
     renderBoard() {
-        const container = document.getElementById('sudokuBoard');
-        container.innerHTML = '';
+        const boardEl = document.getElementById('sudokuBoard');
+        boardEl.innerHTML = '';
         for (let r = 0; r < 9; r++) {
             for (let c = 0; c < 9; c++) {
                 const cell = document.createElement('div');
@@ -102,9 +91,8 @@ const ui = {
                     cell.textContent = val;
                     if (!this.state.given[r][c] && val !== this.state.solution[r][c]) cell.classList.add('error');
                 }
-                
                 cell.onclick = () => { this.state.selected = {r, c}; this.renderBoard(); };
-                container.appendChild(cell);
+                boardEl.appendChild(cell);
             }
         }
     },
@@ -124,17 +112,31 @@ const ui = {
     fillCell(n) {
         if (!this.state.selected || this.state.given[this.state.selected.r][this.state.selected.c]) return;
         const {r, c} = this.state.selected;
-        
-        if (this.state.noteMode && n !== 0) {
-            // Logique de notes simplifiée pour cet exemple
-            return;
-        }
-
         this.state.board[r][c] = n;
         if (n !== 0 && n !== this.state.solution[r][c]) this.state.errors++;
-        
         this.renderBoard();
         this.checkWin();
+    },
+
+    toggleNotes() {
+        this.state.noteMode = !this.state.noteMode;
+        document.getElementById('noteBtn').classList.toggle('active');
+    },
+
+    giveHint() {
+        for(let r=0; r<9; r++) {
+            for(let c=0; c<9; c++) {
+                if(this.state.board[r][c] === 0) {
+                    this.state.board[r][c] = this.state.solution[r][c];
+                    this.renderBoard();
+                    return;
+                }
+            }
+        }
+    },
+
+    undo() {
+        alert("Fonction bientôt disponible !");
     },
 
     checkWin() {
@@ -147,6 +149,3 @@ const ui = {
         }
     }
 };
-
-// Lancement
-ui.init();
