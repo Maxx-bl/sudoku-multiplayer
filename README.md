@@ -12,10 +12,10 @@ Jeu de Sudoku responsive développé en JavaScript.
 Le mode multijoueur 1v1 est actuellement en cours d'implémentation.
 
 ## Accès au site
-Le projet est consultable à l'adresse suivante : [maxx-bl.github.io/sudoku-multiplayer](maxx-bl.github.io/sudoku-multiplayer)
+Le projet est consultable à l'adresse suivante : [maxx-bl.github.io/sudoku-multiplayer](https://maxx-bl.github.io/sudoku-multiplayer/)
 
 ## Installation
-Ouvrez le fichier `index.html` dans un navigateur ou [cliquez sur le lien](maxx-bl.github.io/sudoku-multiplayer) pour lancer l'application.
+Ouvrez le fichier `index.html` dans un navigateur ou [cliquez sur le lien](https://maxx-bl.github.io/sudoku-multiplayer/) pour lancer l'application.
 
 ## Licence
 Ce projet est sous licence MIT.
