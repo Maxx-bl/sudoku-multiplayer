@@ -1,6 +1,6 @@
 # Sudoku Multiplayer
 
-Jeu de Sudoku responsive développé en JavaScript.
+Jeu de Sudoku responsive développé en JavaScript avec intelligence artificielle (Claude/Gemini).
 
 ## Caractéristiques
 - Génération de grilles dynamiques.
